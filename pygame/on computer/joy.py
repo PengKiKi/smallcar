@@ -56,6 +56,8 @@ axisa=[]
 buttona=[]
 hata=[]
 packdata=bytes()
+a2=bytes()
+check1 = 0
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 pygame.init()
@@ -169,12 +171,19 @@ while not done:
     pygame.display.flip()
 
 #    updatedata=struct.pack('5f23?ii',for i in packdata)
-    a = struct.unpack('5f2i23?',packdata)
+    #a = struct.unpack('5f2i23?',packdata)
+    if check1 == 0:
+        a2=packdata
+        check1=1
+
+    if a2 != packdata:
+        a2 = packdata
+        s.sendto(packdata, ('192.168.0.110', 9999))
 
 
-    s.sendto(packdata, ('192.168.0.122', 9999))
+
+
     packdata = bytes()
-
     # Limit to 60 frames per second
     clock.tick(60)
 

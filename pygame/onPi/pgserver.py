@@ -4,62 +4,172 @@ import pygame
 from sys import exit
 import socket
 import threading, time, random
+import struct
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.bind(('192.168.0.122', 9999))
-bg = (255, 255, 255)
+s.bind(('192.168.0.110', 9999))
 
+# Define some colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-horiz_axis_pos=0
+
+
+class TextPrint(object):
+    """
+    This is a simple class that will help us print to the screen
+    It has nothing to do with the joysticks, just outputting the
+    information.
+    """
+
+    def __init__(self):
+        """ Constructor """
+        self.reset()
+        self.x_pos = 10
+        self.y_pos = 10
+        self.font = pygame.font.Font(None, 20)
+
+    def print(self, my_screen, text_string):
+        """ Draw text onto the screen. """
+        text_bitmap = self.font.render(text_string, True, BLACK)
+        my_screen.blit(text_bitmap, [self.x_pos, self.y_pos])
+        self.y_pos += self.line_height
+
+    def reset(self):
+        """ Reset text to the top of the screen. """
+        self.x_pos = 10
+        self.y_pos = 10
+        self.line_height = 15
+
+    def indent(self):
+        """ Indent the next line of text """
+        self.x_pos += 10
+
+    def unindent(self):
+        """ Unindent the next line of text """
+        self.x_pos -= 10
+
+axisa=[]
+buttona=[]
+hata=[]
+
 
 pygame.init()
-screen = pygame.display.set_mode((800, 450))
-pygame.display.set_caption("Hello, World!")
-background = pygame.image.load('bg.jpg').convert_alpha()
-background2 = pygame.image.load('bg.jpg').convert_alpha()
-plane = pygame.image.load('sundy2.png').convert_alpha()
 
-def readdata():
-    while 1:
-        global horiz_axis_pos,s
-        data, addr = s.recvfrom(1024)
-        horiz_axis_pos=float(data.decode('utf-8'))
-        s.sendto(addr[0].encode('utf-8'),addr)
+# Set the width and height of the screen [width,height]
+size = [500, 700]
+screen = pygame.display.set_mode(size)
+
+pygame.display.set_caption("My Game")
+
+# Loop until the user clicks the close button.
+done = False
+
+# Used to manage how fast the screen updates
+clock = pygame.time.Clock()
+
+# Initialize the joysticks
+pygame.joystick.init()
+
+# Get ready to print
+textPrint = TextPrint()
+
+# -------- Main Program Loop -----------
+while not done:
+
+    data, addr = s.recvfrom(1024)
+    a = struct.unpack('5f2i23?', data)
+    a=list(a)
+    axisa = a[0:5]
+    hata = a[5:7]
+    buttona = a[7:30]
+    # EVENT PROCESSING STEP
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            done = True
+
+        # Possible joystick actions: JOYAXISMOTION JOYBALLMOTION JOYBUTTONDOWN
+        # JOYBUTTONUP JOYHATMOTION
+        if event.type == pygame.JOYBUTTONDOWN:
+            print("Joystick button pressed.")
+        if event.type == pygame.JOYBUTTONUP:
+            print("Joystick button released.")
+
+    # DRAWING STEP
+    # First, clear the screen to white. Don't put other drawing commands
+    # above this, or they will be erased with this command.
+    screen.fill(WHITE)
+    textPrint.reset()
+
+    # Get count of joysticks
+    joystick_count = 1
+
+    textPrint.print(screen, "Number of joysticks: {}".format(joystick_count))
+    textPrint.indent()
+
+    # For each joystick:
+    for i in range(joystick_count):
+
+
+        textPrint.print(screen, "Joystick {}".format(i))
+        textPrint.indent()
+
+        # Get the name from the OS for the controller/joystick
+        name = 'Pengkiki Pi'
+        textPrint.print(screen, "Joystick name: {}".format(name))
+
+        # Usually axis run in pairs, up/down for one, and left/right for
+        # the other.
+        axes = 5
+        textPrint.print(screen, "Number of axes: {}".format(axes))
+        textPrint.indent()
+
+        for i in range(axes):
+            axis = axisa[i]
+            textPrint.print(screen, "Axis {} value: {:>6.3f}".format(i, axis))
+
+        textPrint.unindent()
+
+        # Hat switch. All or nothing for direction, not like joysticks.
+        # Value comes back in an array.
+        hats = 1
+        textPrint.print(screen, "Number of hats: {}".format(hats))
+        textPrint.indent()
+
+        for i in range(hats):
+            hat = [hata[0],hata[1]]
+
+            textPrint.print(screen, "Hat {} value: {}".format(i, str(hat)))
+        textPrint.unindent()
+
+        textPrint.unindent()
 
 
 
-t1 = threading.Thread(target=readdata,args=())
 
-#t2 = threading.Thread(target=move,args=())
+        buttons = 23
+        textPrint.print(screen, "Number of buttons: {}".format(buttons))
+        textPrint.indent()
 
-
-t1.start()
-
-
-while True:
-    #gloabl horiz_axis_pos,
-    screen.blit(background2, (0, 0))
-    screen.blit(background, (0, 0))
-    x, y = pygame.mouse.get_pos()
-
-    #horiz_axis_pos = 400
-    vert_axis_pos = 0
-
-    #UDP reveive
-    
-    
-    #temp=str(addr)
-    
+        for i in range(buttons):
+            button = buttona[i]
+            textPrint.print(screen, "Button {:>2} value: {}".format(i, button))
+        textPrint.unindent()
 
 
-    print("x: ",horiz_axis_pos , "  Y:",vert_axis_pos)
-    a= plane.get_width()  + 800*horiz_axis_pos/2 -50
-    b= plane.get_height() / 2 + 400*vert_axis_pos/2
-    
-    screen.fill(bg)
-    screen.blit(plane, (a,b))
+
+    # ALL CODE TO DRAW SHOULD GO ABOVE THIS COMMENT
+
+    # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
-    
-    pygame.display.update()
-    #pygame.time.delay(1)
+
+#    updatedata=struct.pack('5f23?ii',for i in packdata)
+
+
+
+    # Limit to 60 frames per second
+    clock.tick(60)
+
+# Close the window and quit.
+# If you forget this line, the program will 'hang'
+# on exit if running from IDLE.
+pygame.quit()
