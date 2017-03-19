@@ -5,10 +5,18 @@ from sys import exit
 import socket
 import threading, time, random
 import struct
+import spidev as SPI
 
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind(('192.168.0.122', 9999))
+
+bus=0
+device=0
+spi=SPI.SpiDev(bus,device)
+spi.open (0,0 )
+spi.max_speed_hz = 500000
+spi.mode = 0b00
 
 # Define some colors
 BLACK = (0, 0, 0)
@@ -166,6 +174,13 @@ while not done:
 #    updatedata=struct.pack('5f23?ii',for i in packdata)
 
 
+    steer = (axisa[0]+1)*65535/2
+    steer = int(steer)
+    acc = (axisa[2]+ 1)*256/2
+    acc = int(acc)
+    dcc = (axisa[3]+ 1)*256/2
+    dcc = int(dcc)
+    r = spi.xfer2([0, 10, 80, 10, steer/256, steer%256, acc, dcc])
 
     # Limit to 60 frames per second
     clock.tick(30)

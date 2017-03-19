@@ -11,6 +11,7 @@ Show everything we can pull off the joystick
 import pygame
 import socket
 import struct
+import time
 import threading
 
 # Define some colors
@@ -172,20 +173,22 @@ while not done:
 
 #    updatedata=struct.pack('5f23?ii',for i in packdata)
     #a = struct.unpack('5f2i23?',packdata)
+
+# for not to send message too fast
     if check1 == 0:
         a2=packdata
         check1=1
 
     if a2 != packdata:
         a2 = packdata
-        s.sendto(packdata, ('192.168.0.110', 9999))
+        s.sendto(packdata, ('192.168.0.122', 9999))
 
 
 
-
+    time.sleep(0.02)
     packdata = bytes()
     # Limit to 60 frames per second
-    clock.tick(60)
+    clock.tick(30)
 
 # Close the window and quit.
 # If you forget this line, the program will 'hang'
