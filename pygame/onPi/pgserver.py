@@ -7,7 +7,7 @@ import threading, time, random
 import struct
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.bind(('192.168.0.110', 9999))
+s.bind(('192.168.0.122', 9999))
 
 # Define some colors
 BLACK = (0, 0, 0)
@@ -28,7 +28,7 @@ class TextPrint(object):
         self.y_pos = 10
         self.font = pygame.font.Font(None, 20)
 
-    def print(self, my_screen, text_string):
+    def printg(self, my_screen, text_string):
         """ Draw text onto the screen. """
         text_bitmap = self.font.render(text_string, True, BLACK)
         my_screen.blit(text_bitmap, [self.x_pos, self.y_pos])
@@ -103,42 +103,42 @@ while not done:
     # Get count of joysticks
     joystick_count = 1
 
-    textPrint.print(screen, "Number of joysticks: {}".format(joystick_count))
+    textPrint.printg(screen, "Number of joysticks: {}".format(joystick_count))
     textPrint.indent()
 
     # For each joystick:
     for i in range(joystick_count):
 
 
-        textPrint.print(screen, "Joystick {}".format(i))
+        textPrint.printg(screen, "Joystick {}".format(i))
         textPrint.indent()
 
         # Get the name from the OS for the controller/joystick
         name = 'Pengkiki Pi'
-        textPrint.print(screen, "Joystick name: {}".format(name))
+        textPrint.printg(screen, "Joystick name: {}".format(name))
 
         # Usually axis run in pairs, up/down for one, and left/right for
         # the other.
         axes = 5
-        textPrint.print(screen, "Number of axes: {}".format(axes))
+        textPrint.printg(screen, "Number of axes: {}".format(axes))
         textPrint.indent()
 
         for i in range(axes):
             axis = axisa[i]
-            textPrint.print(screen, "Axis {} value: {:>6.3f}".format(i, axis))
+            textPrint.printg(screen, "Axis {} value: {:>6.3f}".format(i, axis))
 
         textPrint.unindent()
 
         # Hat switch. All or nothing for direction, not like joysticks.
         # Value comes back in an array.
         hats = 1
-        textPrint.print(screen, "Number of hats: {}".format(hats))
+        textPrint.printg(screen, "Number of hats: {}".format(hats))
         textPrint.indent()
 
         for i in range(hats):
             hat = [hata[0],hata[1]]
 
-            textPrint.print(screen, "Hat {} value: {}".format(i, str(hat)))
+            textPrint.printg(screen, "Hat {} value: {}".format(i, str(hat)))
         textPrint.unindent()
 
         textPrint.unindent()
@@ -147,12 +147,12 @@ while not done:
 
 
         buttons = 23
-        textPrint.print(screen, "Number of buttons: {}".format(buttons))
+        textPrint.printg(screen, "Number of buttons: {}".format(buttons))
         textPrint.indent()
 
         for i in range(buttons):
             button = buttona[i]
-            textPrint.print(screen, "Button {:>2} value: {}".format(i, button))
+            textPrint.printg(screen, "Button {:>2} value: {}".format(i, button))
         textPrint.unindent()
 
 
