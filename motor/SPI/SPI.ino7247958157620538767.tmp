@@ -1,0 +1,46 @@
+
+
+typedef struct rec
+{
+     float  gas;
+     float  stopper;
+     float  steering;
+
+}rec;
+int sync=0;
+byte comchar[sizeof(rec)];
+
+rec re;
+
+  void setup(){
+
+    
+     Serial.begin(115200);
+      while(Serial.read()>= 0){}//clear serial port  
+  }
+
+  void loop(){
+    while (Serial.available() > 0);
+    
+      if (Serial.read() == 0xff )
+        {
+          while (Serial.available() > 0);
+          if (Serial.peek() == 0xfe )
+          {
+            Serial.read();
+            sync=1;
+          }
+        }
+        
+     while (sync)
+     {
+      for(int i=0; i < 12; i++){
+      while (Serial.available() > 0);
+      comchar[i]=Serial.read();
+     }
+     sync=0;
+     }
+    *re=(byte*)&comchar
+
+     
+  }
