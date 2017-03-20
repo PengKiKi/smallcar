@@ -1,4 +1,5 @@
 #include <SPI.h>
+#include <Servo.h> 
 
 byte buf [5];
 byte buf2[4];
@@ -6,6 +7,10 @@ byte sync[3];
 int flag=0;
 volatile byte pos;
 volatile boolean process_it;
+int acc=0,dcc=0,diif=0;
+int spdl=0,spdr=0;
+Servo myservol;
+Servo myservor;
 
 union data
 {
@@ -20,6 +25,9 @@ data readrel;
 void setup (void)
 {
   Serial.begin (250000);
+
+  myservol.attach(9);
+  myservor.attach(8);
 
   // have to send on master in, *slave out*
   pinMode(MISO, OUTPUT);
@@ -79,20 +87,31 @@ void loop (void)
     readrel.b[0]=buf[1];
     angle = readrel.a;
     angle = angle/65535*360-180;
+    acc = map(buf[2], 0, 256, 0, 270);
+    dcc = map(buf[3], 0, 256, 0, 180);
+    acc=270-acc;
+    dcc=180-dcc;
+    
+    
+    spdl=angle+acc-dcc+90;
+    if (spdl>180)
+    spdl=180;
+    if (spdl<0)
+    spdl=0;
+    spdr=-angle+acc-dcc+90;
+    if (spdr>180)
+    spdr=180;
+    if (spdr<0)
+    spdr=0;
+   
+    myservol.write(spdl);
+    myservor.write(spdr);
+
     if (angle>0){
-    Serial.print ("  ");
-    Serial.print(abs(angle));
-    Serial.print ("__\t");
-    }
-    else
-    {
-    Serial.print ("__");
-    Serial.print(abs(angle));
-    Serial.print ("  \t");
-    }
-    Serial.print (" ---  acc: ");
-    Serial.print(buf[2]);Serial.print ("  dcc:");
-    Serial.println(buf[3]);
+    Serial.print ("  ");Serial.print(abs(angle));Serial.print ("__\t");}
+    else {
+    Serial.print ("__");Serial.print(abs(angle));Serial.print ("  \t");}
+    Serial.print ("  acc: ");Serial.print(acc/2.7,0);Serial.print ("%  dcc:");Serial.print(dcc/1.8,0);Serial.println ("%");
     
     pos = 0;
     process_it = false;
