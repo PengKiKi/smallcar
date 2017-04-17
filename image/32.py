@@ -13,7 +13,15 @@ url = r"http://192.168.0.122:10088/?action=snapshot"
 face_cascade = cv2.CascadeClassifier('data/haarcascade_frontalface_default.xml')
 eye_cascade = cv2.CascadeClassifier('data/haarcascade_eye.xml')
 
+fd = urllib.request.urlopen(url)
+image_file = io.BytesIO(fd.read())
+im = Image.open(image_file)
+img = cv2.cvtColor(np.array(im), cv2.COLOR_RGB2BGR)
+img = cv2.flip(img, 1)
 
+kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3))
+#fgbg = cv2.createBackgroundSubtractorMOG2()
+fgbg = cv2.createBackgroundSubtractorMOG2()
 
 
 def nothing(x):
@@ -45,7 +53,12 @@ while True:
     im = cv2.GaussianBlur(img, (flag4*2+1, flag4*2+1), flag2)
     #im = cv2.bilateralFilter(img, flag4, 75, 75)
 
-    canny = cv2.Canny(im, flag1, 3*flag2)
+    fgmask = fgbg.apply(img)
+    fgmask = cv2.morphologyEx(fgmask, cv2.MORPH_OPEN, kernel)
+
+    dst = cv2.medianBlur(img, 5)
+
+    canny = cv2.Canny(dst, flag1, 3*flag2)
 
     #img2 = img[200:300, 200:300]
     #cv2.rectangle(img2, (0, 0), (10, 10), (0, 255, 0), 2)
@@ -70,8 +83,9 @@ while True:
     #img = cv2.drawKeypoints(img, kps,img)
     '''
 
+
     cv2.imshow('Track Bar', canny)
-    cv2.imshow('Track Bar2', im)
+    cv2.imshow('Track Bar2', fgmask)
     cv2.imshow('myself',img)
 
     k = cv2.waitKey(1)
