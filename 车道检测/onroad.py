@@ -2,9 +2,12 @@ from collections import deque
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
+import urllib
 import glob
+import io
 import json
 from moviepy.editor import VideoFileClip
+from PIL import Image
 
 
 
@@ -409,6 +412,7 @@ class LaneDetector:
         return result
 
 
+
 det=LaneDetector()
 
 '''
@@ -418,11 +422,21 @@ white_clip = clip1.fl_image(det.processSingleImage)
 white_clip.write_videofile(white_output, audio=False)
 '''
 
-while False:
+while True:
 
     #img = cv2.imread(fimg)
     #res = det.processSingleImage(img)
     #cv2.imshow('Result', res)
+
+    url = r"http://192.168.0.122:10088/?action=snapshot"
+
+    fd = urllib.request.urlopen(url)
+    image_file = io.BytesIO(fd.read())
+    im = Image.open(image_file)
+    img = cv2.cvtColor(np.array(im), cv2.COLOR_RGB2BGR)
+    img = cv2.flip(img, 1)
+    res = det.processSingleImage(img)
+    cv2.imshow('Result', res)
 
     k = cv2.waitKey(1)
     if k == 27:  # wait for ESC key to exit

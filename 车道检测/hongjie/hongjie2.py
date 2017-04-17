@@ -312,12 +312,15 @@ def process_image(img):
     cv2.imshow('canny', img)
 
     imshape = img.shape
-    img = region_of_interest(img, vertices=np.array([[(0, 282), (20,100), (297,100), (515,354)]],dtype=np.int32))
+    img = region_of_interest(img, vertices=np.array([[(0, 282), (20,100), (397,100), (515,364)]],dtype=np.int32))
     #result=img
     cv2.imshow('ROI', img)
-    line_img = hough_lines(img, rho=1, theta=np.pi / 180, threshold=30, min_line_len=20, max_line_gap=40)
+    line_img = hough_lines(img, rho=1, theta=np.pi / 180, threshold=52, min_line_len=150, max_line_gap=205)
 
     cv2.imshow('line', line_img)
+    img=cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    temp2=weighted_img(line_img, img, α=0.7, β=500., λ=.1)
+    cv2.imshow('ROI2', temp2)
 
     result = weighted_img(line_img, temp, α=0.7, β=500., λ=.1)
 
