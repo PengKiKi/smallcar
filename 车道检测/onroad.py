@@ -9,8 +9,6 @@ import json
 from moviepy.editor import VideoFileClip
 from PIL import Image
 
-
-
 class LaneDetector:
     """
     My class for lane detetion.
@@ -412,7 +410,6 @@ class LaneDetector:
         return result
 
 
-
 det=LaneDetector()
 
 '''
@@ -435,6 +432,8 @@ while True:
     im = Image.open(image_file)
     img = cv2.cvtColor(np.array(im), cv2.COLOR_RGB2BGR)
     img = cv2.flip(img, 1)
+
+
     res = det.processSingleImage(img)
     cv2.imshow('Result', res)
 

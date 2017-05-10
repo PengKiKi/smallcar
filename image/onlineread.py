@@ -1,12 +1,13 @@
 import cv2
 import tensorflow as tf
 import numpy as np
-import urllib
+import urllib.request
 import os
 import io
 from PIL import Image
 
 
+cap = cv2.VideoCapture(0)
 
 url = r"http://192.168.0.122:10088/?action=snapshot"
 
@@ -21,6 +22,9 @@ while True:
     im = Image.open(image_file)
 
     img = cv2.cvtColor(np.array(im), cv2.COLOR_RGB2BGR)
+
+    ret, img = cap.read()
+    img = cv2.flip(img, 1)
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #gray = np.float32(gray)

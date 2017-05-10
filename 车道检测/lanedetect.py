@@ -1,3 +1,5 @@
+#encoding:utf-8
+
 from collections import deque
 import matplotlib.pyplot as plt
 import numpy as np
@@ -267,9 +269,10 @@ class LaneDetector:
         diff=lane_center-img_center
         self.diffm=diff*xm_per_pix
 
-        img=cv2.putText(img,'Curvature left: %.1f m'%(self.left_curverad),(50,50), self.font, 1,(255,255,255),2,cv2.LINE_AA)
-        img=cv2.putText(img,'Curvature right: %.1f m'%(self.right_curverad),(50,100), self.font, 1,(255,255,255),2,cv2.LINE_AA)
-        img=cv2.putText(img,'Dist from center: %.2f m'%(self.diffm),(50,150), self.font, 1,(255,255,255),2,cv2.LINE_AA)
+        img = cv2.putText(img, 'PengKiKi' , (50, 25), self.font, 0.8,(255, 0, 0), 2, cv2.LINE_AA)
+        img=cv2.putText(img,'Curvature left: %.1f m'%(self.left_curverad),(50,60), self.font, 0.8,(255,255,255),2,cv2.LINE_AA)
+        img=cv2.putText(img,'Curvature right: %.1f m'%(self.right_curverad),(50,100), self.font, 0.8,(255,255,255),2,cv2.LINE_AA)
+        img=cv2.putText(img,'Dist from center: %.2f m'%(self.diffm),(50,140), self.font, 0.8,(255,255,255),2,cv2.LINE_AA)
 
     def fitAndShow(self,warped,undist,points):
         '''
@@ -411,18 +414,28 @@ class LaneDetector:
 
 det=LaneDetector()
 
-'''
-white_output = 'white.mp4'
-clip1 = VideoFileClip("solidWhiteRight.mp4")
+
+white_output = 'cha.mp4'
+clip1 = VideoFileClip("challenge.mp4")
 white_clip = clip1.fl_image(det.processSingleImage)
 white_clip.write_videofile(white_output, audio=False)
-'''
+
+
+#cap = cv2.VideoCapture("IMG_2701.MOV")
 
 while False:
 
     #img = cv2.imread(fimg)
     #res = det.processSingleImage(img)
     #cv2.imshow('Result', res)
+    ret, frame = cap.read()
+    frame = cv2.resize(frame, (0, 0),fx=0.5, fy=0.5)
+    (h, w) = frame.shape[:2]
+    center = (w / 2, h / 2)
+    M = cv2.getRotationMatrix2D(center, -90, 1)
+    frame = cv2.warpAffine(frame, M, (w, h))
+    res = det.processSingleImage(frame)
+    cv2.imshow('frame', res)
 
     k = cv2.waitKey(1)
     if k == 27:  # wait for ESC key to exit
